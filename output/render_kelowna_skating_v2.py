@@ -53,9 +53,8 @@ def T(d, xy, s, size, fill=(255, 255, 255, 255), stroke=0, sfill=(0, 0, 0, 255),
 def a(c, al): return c[:3] + (int(255 * al),)
 
 def caption_box(d, cx, cy, s, size, fg, bg, al):
-    w = d.textlength(s, font=F(size)) + 56
-    d.rounded_rectangle([cx - w / 2, cy - size * 0.78, cx + w / 2, cy + size * 0.78], 18, fill=a(bg, al))
-    T(d, (cx, cy), s, size, a(fg, al), anchor="mm")
+    col = {(255, 222, 60): (255, 222, 60), (220, 50, 70): (255, 95, 115)}.get(tuple(bg), (255, 255, 255))
+    T(d, (cx, cy), s, size, a(col, al), stroke=max(5, size // 9), sfill=a((0, 0, 0), al), anchor="mm")
 
 def overlay(img, seg, lt, t):
     ov = seg["ov"]
@@ -74,13 +73,11 @@ def overlay(img, seg, lt, t):
         caption_box(d, 540, 410, "Stuart Park（無料）", 70, (255, 255, 255), (20, 20, 20), e)
         e2 = ease((lt - 0.4) / 0.4)
         y0 = 1330 + int((1 - e2) * 60)
-        d.rounded_rectangle([50, y0, 950, y0 + 250], 30, fill=(255, 255, 255, int(235 * e2)))
         rows = [("時間", "毎日 6:00〜23:00"), ("期間", "12月上旬〜2月末ごろ（天候次第）")]
         for i, (k, v) in enumerate(rows):
             y = y0 + 40 + i * 95
-            d.rounded_rectangle([80, y, 210, y + 64], 16, fill=(20, 60, 140, int(255 * e2)))
-            T(d, (145, y + 33), k, 34, a((255, 255, 255), e2), anchor="mm")
-            T(d, (235, y + 33), v, 42, a((20, 25, 45), e2), anchor="lm")
+            T(d, (80, y + 33), k, 44, a((255, 222, 60), e2), stroke=6, sfill=a((0, 0, 0), e2), anchor="lm")
+            T(d, (215, y + 33), v, 46, a((255, 255, 255), e2), stroke=6, sfill=a((0, 0, 0), e2), anchor="lm")
     elif ov == "outro":
         e = ease(lt / 0.4)
         d.rectangle([0, 0, W, H], fill=(0, 0, 0, int(80 * e)))
@@ -95,18 +92,16 @@ def overlay(img, seg, lt, t):
         # number badge top-right of map card area + info card over the lower part
         e = ease(lt / 0.35)
         lab = f"{ov['num']} / 4   {ov['area']}"
-        caption_box(d, 540, 1300 + int((1 - e) * 40), lab, 44, (20, 20, 20), (255, 222, 60), e)
+        caption_box(d, 540, 960 + int((1 - e) * 40), lab, 48, (20, 20, 20), (255, 222, 60), e)
         e2 = ease((lt - 0.2) / 0.4)
-        y0 = 1370 + int((1 - e2) * 80)
-        d.rounded_rectangle([40, y0, 960, y0 + 330], 30, fill=(18, 24, 44, int(240 * e2)))
+        y0 = 1010 + int((1 - e2) * 80)
         for i, (k, v) in enumerate(ov["rows"]):
             le = ease((lt - 0.45 - i * 0.2) / 0.35)
             if le <= 0: continue
-            y = y0 + 32 + i * 98
+            y = y0 + 32 + i * 100
             xo = int((1 - le) * 50)
-            d.rounded_rectangle([70 + xo, y, 220 + xo, y + 66], 16, fill=(255, 222, 60, int(255 * le)))
-            T(d, (145 + xo, y + 34), k, 34, a((20, 20, 20), le), anchor="mm")
-            T(d, (245 + xo, y + 34), v, 44, a((255, 255, 255), le), anchor="lm")
+            T(d, (60 + xo, y + 34), k, 44, a((255, 222, 60), le), stroke=6, sfill=a((0, 0, 0), le), anchor="lm")
+            T(d, (230 + xo, y + 34), v, 48, a((255, 255, 255), le), stroke=6, sfill=a((0, 0, 0), le), anchor="lm")
     # progress bar
     d.rectangle([0, 0, int(W * t / TOTAL), 10], fill=(255, 222, 60, 255))
 
